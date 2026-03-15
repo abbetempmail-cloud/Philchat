@@ -1,4 +1,4 @@
-// /api/chat.js
+// api/chat.js
 import OpenAI from "openai";
 
 export default async function handler(req, res) {
@@ -33,7 +33,7 @@ export default async function handler(req, res) {
 
     res.status(200).json({ reply: completion.choices[0].message.content });
   } catch (err) {
-    console.error(err);
+    console.error(err); // this will show the real error in Vercel logs
     res.status(500).json({ error: "Server error" });
   }
 }
