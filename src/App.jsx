@@ -8,7 +8,6 @@ export default function App() {
   const [typing, setTyping] = useState(false);
   const chatEndRef = useRef(null);
 
-  // Scroll to bottom when messages update
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, typing]);
@@ -31,7 +30,6 @@ export default function App() {
       if (!res.ok) throw new Error("Server error");
 
       const data = await res.json();
-
       setMessages(prev => [...prev, { sender: "phil", text: data.reply }]);
     } catch (err) {
       console.error(err);
@@ -50,12 +48,8 @@ export default function App() {
 
   return (
     <div style={{ height: "100vh", display: "flex", flexDirection: "column", background: "#f3f3f3" }}>
-      {/* Header */}
-      <div style={{ padding: "16px", background: "#2563eb", color: "white", fontWeight: "bold" }}>
-        Phil
-      </div>
+      <div style={{ padding: "16px", background: "#2563eb", color: "white", fontWeight: "bold" }}>Phil</div>
 
-      {/* Chat messages */}
       <div style={{ flex: 1, overflowY: "auto", padding: "16px" }}>
         {messages.map((m, i) => (
           <div key={i} style={{ textAlign: m.sender === "user" ? "right" : "left", marginBottom: "10px" }}>
@@ -78,7 +72,6 @@ export default function App() {
         <div ref={chatEndRef}></div>
       </div>
 
-      {/* Input area */}
       <div style={{ padding: "12px", display: "flex", gap: "8px", background: "white" }}>
         <input
           style={{ flex: 1, padding: "8px" }}
