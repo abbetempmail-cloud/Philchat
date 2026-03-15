@@ -1,27 +1,39 @@
-
+// /api/chat.js
 import OpenAI from "openai";
 
-export default async function handler(req) {
+export default async function handler(req, res) {
   if (req.method !== "POST") {
-    return new Response(JSON.stringify({ error: "Only POST allowed" }), { status: 405 });
+    return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { message } = await req.json();
+  try {
+    const { message } = JSON.parse(req.body || "{}");
 
-  const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+    if (!message) {
+      return res.status(400).json({ error: "No message provided" });
+    }
 
-  const completion = await client.chat.completions.create({
-    model: "gpt-4o-mini",
-    messages: [
-      {
-        role: "system",
-        content: "You are Phil, a friendly texting friend, almost a copy of the user. Born in Beirut 1983, lives in Barcelona, casual, witty, supportive, sometimes funny. Always reply like a friend texting, never mention AI."
-      },
-      { role: "user", content: message }
-    ]
-  });
+    if (!process.env.OPENAI_API_KEY) {
+      console.error("Missing OPENAI_API_KEY");
+      return res.status(500).json({ error: "Server misconfigured" });
+    }
 
-  return new Response(JSON.stringify({ reply: completion.choices[0].message.content }), {
-    headers: { "Content-Type": "application/json" }
-  });
+    const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+    const completion = await client.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        {
+          role: "system",
+          content: "You are Phil, a friendly texting friend, born in Beirut 1983, lives in Barcelona. Casual, witty, supportive, sometimes funny. Reply like a friend texting. Never mention AI."
+        },
+        { role: "user", content: message }
+      ]
+    });
+
+    res.status(200).json({ reply: completion.choices[0].message.content });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
 }
